@@ -24,3 +24,14 @@ Sure, let's get started!
 
 Remember, these are basic implementations and you might need to adjust them according to your game logic or add more complexity. For example, you might want to add a delay before starting a new level, or add a condition that an alien has to collide with the player to decrease the player's lives.
 
+👾 Codie Bugs 👾
+
+Looking at your code, the aliens would stop moving because of a logical error in the `update_game_state` method of the `G4M3` class. When you calculate the `rightmost_alien_x` and `leftmost_alien_x`, it can lead to a situation where all the aliens have been eliminated and these variables are undefined. This is also the reason you were getting a ValueError before. To fix this, you need to add a check to see if there are any aliens left before trying to calculate the rightmost and leftmost alien's x-coordinate. 
+
+To clear all the bullets when a new level starts, you can simply set `self.bullets` to an empty list in the `start_new_level` method.
+
+Here is the modified code:
+
+Please note that while this code removes bullets and moves aliens, there is still no check for when bullets leave the screen or for when aliens collide with the player. These are things you might want to add in the future.
+
+👾 Codie Bugs 👾

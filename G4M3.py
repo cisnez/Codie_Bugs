@@ -45,6 +45,9 @@ class G4M3(B453Object):
 
         
     def start_new_level(self):
+        print("You eliminated all the codie bugs!\nGet ready for the next push!")
+        # Clear bullets
+        self.bullets = []
         # Create aliens in rows
         self.aliens = []
         # Creates 5 rows of aliens
@@ -113,25 +116,26 @@ class G4M3(B453Object):
         # Not move the player by default
         self.player.move(0, 0) 
 
-        # Add a new bullet to the list every game update for testing
+        # Add a new bullet to the list for every call to player.shoot
         new_bullet = self.player.shoot()
         if new_bullet is not None:
             self.bullets.append(new_bullet)
-        
-        # Move aliens
-        rightmost_alien_x = max(alien.x for alien in self.aliens)
-        leftmost_alien_x = min(alien.x for alien in self.aliens)
 
-        if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
-            self.alien_direction *= -1
+        # check if there are any aliens left
+        if self.aliens:
+            rightmost_alien_x = max(alien.x for alien in self.aliens)
+            leftmost_alien_x = min(alien.x for alien in self.aliens)
+            if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
+                self.alien_direction *= -1
+                for alien in self.aliens:
+                    alien.y += alien.down_speed
+
             for alien in self.aliens:
-                alien.y += alien.down_speed
-
-        for alien in self.aliens:
-            # Alien has reached the player
-            if alien.y >= self.player.y:
-                # Decrease player's lives
-                self.player.decrease_lives()
+                alien.move(self.alien_direction)
+                # Alien has reached the player
+                if alien.y >= self.player.y:
+                    # Decrease player's lives
+                    self.player.decrease_lives()
 
         # Move bullets and check for collisions
         for bullet in self.bullets:
@@ -142,11 +146,6 @@ class G4M3(B453Object):
                     self.aliens.remove(alien)
                     break
 
-    # def draw_game_state(self):
-    #     # For now, just print the game state to the console
-    #     print('Player position:', self.player.x, self.player.y)
-    #     print('Alien positions:', [(alien.x, alien.y) for alien in self.aliens])
-    #     print('Bullet positions:', [(bullet.x, bullet.y) for bullet in self.bullets])
     def draw_game_state(self):
         # Clear the screen by filling it with black
         self.screen.fill((0, 0, 0)) 

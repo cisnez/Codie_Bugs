@@ -1,15 +1,12 @@
 Project: Learning Python listeners, messages, events, sentinels, and triggers.
 
-User
-I'm ready to get started on this python learning project again.
+User:
+For some reason the codie bugs stopped moving back and forth on the display surface.
 
-Please write code to: 
-  Implement Player Controls: 
-    Add keyboard controls to allow the player to move and shoot bullets.
+After I eliminated all the codie bugs, the console displayed, `Level completed!`; A new matrix of aliens spawned for a new level; The bullets from the previous level were still in flight and eliminated some of the codie bugs on the new level.
 
-Remove the random Player input and implement movement using Right and Left arrow keys
- OR `a` and `d` keys for left and right Player entity movement. 
-Add code to call the player.shoot method using `space_bar` OR `w` OR `up_arrow'.
+Please find the reason why the :Codie_Bugs: stopped moving. Then write code to fix it. 
+Implement new level handling that clears all the bullets from the screen; Display message, `You eliminated all the :codie_bugs:!` new line `Get ready for the next push!`.
 
 Game launch point.
 ```#G4M3.py
@@ -35,11 +32,13 @@ class G4M3(B453Object):
         self.level_end_sentinel = None
         
     def start_new_level(self):
+        print("You eliminated all the codie bugs!\nGet ready for the next push!")
+        self.bullets = []
         self.aliens = []
         for row in range(5):
             for col in range(10):
+                # Spacing aliens by 60 pixels and offsetting them by 50 pixels from the edge
                 self.aliens.append(AL13N(col * 60 + 50, row * 60 + 50)) 
-        
         self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
         self.level_end_sentinel.add_listener(self)
 
@@ -62,10 +61,12 @@ class G4M3(B453Object):
             self.level_end_sentinel.check_condition()
             time.sleep(0.1)
 
-    def update_game_state(self):
-        self.player.move()
-        new_bullet = self.player.shoot()
+def update_game_state(self):
+    self.player.move(0, 0) 
+    new_bullet = self.player.shoot()
+    if new_bullet is not None:
         self.bullets.append(new_bullet)
+    if self.aliens:
         rightmost_alien_x = max(alien.x for alien in self.aliens)
         leftmost_alien_x = min(alien.x for alien in self.aliens)
         if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
@@ -74,13 +75,17 @@ class G4M3(B453Object):
                 alien.y += alien.down_speed
         for alien in self.aliens:
             alien.move(self.alien_direction)
-        for bullet in self.bullets:
-            bullet.move()
-            for alien in self.aliens:
-                if bullet.collides_with(alien):
-                    self.bullets.remove(bullet)
-                    self.aliens.remove(alien)
-                    break
+            # Alien has reached the player
+            if alien.y >= self.player.y:
+                # Decrease player's lives
+                self.player.decrease_lives()
+    for bullet in self.bullets:
+        bullet.move()
+        for alien in self.aliens:
+            if bullet.collides_with(alien):
+                self.bullets.remove(bullet)
+                self.aliens.remove(alien)
+                break
 
     def draw_game_state(self):
         self.screen.fill((0, 0, 0)) 
