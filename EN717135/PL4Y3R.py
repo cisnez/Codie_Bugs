@@ -3,22 +3,33 @@
 
 from G4M3Object import G4M3Object
 from EN717135.BULL37 import BULL37
-import random
 
 class PL4Y3R(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.shoot_bullet = False
+        # Player starts with 3 lives
+        self.lives = 3 
 
-    def move(self):
-        dx = random.randint(-1, 1)
-        dy = random.randint(-1, 1)
+    def decrease_lives(self):
+        self.lives -= 1
+        if self.lives == 0:
+            self.trigger_event('game_over')
+
+    def move(self, dx, dy):
         self.x += dx
         self.y += dy
 
     def shoot(self):
-        # Return a new bullet instance that starts at the player's current location
-        return BULL37(self.x, self.y)
+        if self.shoot_bullet:
+            self.shoot_bullet = False
+            # Return a new bullet instance that starts at the player's current location
+            return BULL37(self.x, self.y)
+        else:
+            return None
 
+    def should_shoot(self):
+        self.shoot_bullet = True
 
     def all_your_base_r_belong_2_us(self):
         return self.x <= 0

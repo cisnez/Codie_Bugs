@@ -35,6 +35,7 @@ class G4M3(B453Object):
         self.bullets = []
         # Initialize player at the bottom center of the screen
         self.player = PL4Y3R((800 - 50) / 2, 600 - 50)
+        self.player_speed = 5
 
         # Aliens start moving to the left
         self.alien_direction = -1  
@@ -60,7 +61,8 @@ class G4M3(B453Object):
     def handle_event(self, event):
         if event == 'level_end':
             print("Level completed!")
-            # Additional level completed logic here
+            # start a new level after the current one is completed
+            self.start_new_level()
         elif event == 'game_over':
             print("Game over!")
             # Additional game over logic here
@@ -82,8 +84,22 @@ class G4M3(B453Object):
     # To process these events, you need to call pygame.event.pump() or pygame.event.get() regularly. 
     def run(self):
         while True:
-            for event in pygame.event.get():  # Process system events
-                if event.type == pygame.QUIT:  # The 'X' button was clicked
+            # Get the state of all keyboard keys
+            keys = pygame.key.get_pressed() 
+            # If 'a' or the left arrow key is pressed
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:  
+                self.player.move(-self.player_speed, 0)
+            # If 'd' or the right arrow key is pressed
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]: 
+                self.player.move(self.player_speed, 0)
+            # If 'space' or 'w' or the up arrow key is pressed
+            if keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]:
+                self.player.should_shoot()
+
+            # Process system events
+            for event in pygame.event.get():  
+                # The 'X' button was clicked
+                if event.type == pygame.QUIT:  
                     return
                 # This will keep your window responsive and also allow you to close the window by clicking the 'X' button.
             self.update_game_state()
@@ -94,12 +110,13 @@ class G4M3(B453Object):
 
     # Next, we need to implement the update_game_state and draw_game_state methods. These will be responsible for moving all game objects and checking for collisions (update_game_state), and for drawing all game objects to the screen (draw_game_state). For now, these methods can be very simple:
     def update_game_state(self):
-        # Move player
-        self.player.move()
+        # Not move the player by default
+        self.player.move(0, 0) 
 
         # Add a new bullet to the list every game update for testing
         new_bullet = self.player.shoot()
-        self.bullets.append(new_bullet)
+        if new_bullet is not None:
+            self.bullets.append(new_bullet)
         
         # Move aliens
         rightmost_alien_x = max(alien.x for alien in self.aliens)
@@ -111,7 +128,10 @@ class G4M3(B453Object):
                 alien.y += alien.down_speed
 
         for alien in self.aliens:
-            alien.move(self.alien_direction)
+            # Alien has reached the player
+            if alien.y >= self.player.y:
+                # Decrease player's lives
+                self.player.decrease_lives()
 
         # Move bullets and check for collisions
         for bullet in self.bullets:

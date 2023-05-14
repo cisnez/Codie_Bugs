@@ -82,13 +82,36 @@ Implemented basic movement for the player and aliens. The player can move left a
 Implemented the drawing of the game state and updating of the game state.
 Here are the next steps:
 
-Implement the movement for bullets and their collision detection with aliens.
-Implement the shooting mechanism for the player.
+:done: Implement the movement for bullets and their collision detection with aliens.
+:done: Implement the shooting mechanism for the player.
 Refine the game end conditions.
 Improve the game aesthetics (optional at this stage).
-Implement user input for the player's movement and shooting.
+:done: Implement user input for the player's movement and shooting.
 Implement increasing difficulty with each new level.
 Thorough testing and debugging of the game mechanics and features.
 For testing purposes, we've been using simple geometric shapes to represent game entities. The game is currently text-based, but may move to a graphical representation in the future. The user input has not been implemented yet, so the game runs automatically for now.
 
 Please refer to the project summary and progress so far to understand the details of the implementation and to plan the next steps.
+
+👾 Codie Bugs 👾
+
+Refine the game end conditions.
+Improve the game aesthetics (optional at this stage).
+Implement increasing difficulty with each new level.
+Thorough testing and debugging of the game mechanics and features.
+
+👾 Codie Bugs 👾
+
+Yes, it seems like the next step in your project is to refine the game end conditions. Right now, your game ends with a crash when all aliens are eliminated. Instead, you may want to make the game restart a new level, increase the difficulty, or show a game over screen when certain conditions are met. 
+
+Here are some examples of end conditions you might want to implement:
+
+1. **Player eliminates all aliens:** When the player eliminates all aliens, you could either end the game and display a victory screen, or start a new level with more challenging aliens (for example, aliens that move faster or take multiple hits to eliminate).
+
+2. **Aliens reach the player:** If any alien reaches the player's level on the screen (i.e., the player's y-coordinate), you could end the game and display a game over screen.
+
+3. **Player has no more lives:** If you decide to implement a lives system (where the player can be hit a certain number of times before the game ends), you would end the game when the player runs out of lives.
+
+These are just a few ideas. The specific end conditions you implement will depend on how you want your game to work. Make sure to also update your `S3N71N3L` class's `check_condition` method to reflect these changes, as this is where you're currently handling your end conditions.
+
+👾 Codie Bugs 👾

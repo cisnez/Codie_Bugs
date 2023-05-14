@@ -12,7 +12,9 @@ class S3N71N3L(B453Object):
     def check_condition(self):
         if all(alien.all_aliens_eliminated() for alien in self.aliens):
             self.trigger_event('level_end')
-        # In this case, the condition is a callable (like a function) that returns a boolean value. If the condition is met (i.e., it returns True), the Sentinel triggers the 'level_end' event.
+        # check if any alien has reached the player
+        elif any(alien.y >= self.player.y for alien in self.aliens): 
+            self.trigger_event('game_over')
         elif self.player.all_your_base_r_belong_2_us():
             self.trigger_event('game_over')
 

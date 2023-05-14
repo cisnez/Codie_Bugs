@@ -1,0 +1,26 @@
+Sure, let's get started!
+
+1. **Player eliminates all aliens:** 
+
+    First, you need to check if there are any aliens left in the game. You already have the check in the `S3N71N3L` class's `check_condition` method. If all aliens are eliminated, the 'level_end' event is triggered. This event is already being handled in the `G4M3` class's `handle_event` method. You can add a new level start here:
+
+    In `G4M3.py`, modify `handle_event` method:
+
+2. **Aliens reach the player:** 
+
+    We need to add a check in `S3N71N3L` class's `check_condition` method. If any alien's y-coordinate is greater than or equal to the player's y-coordinate, the 'game_over' event is triggered:
+
+    In `S3N71N3L.py`, modify `check_condition` method:
+
+3. **Player has no more lives:** 
+
+    For this, you'll need to add a lives attribute to the `PL4Y3R` class, decrement it when the player is hit, and trigger a 'game_over' event when lives reach zero:
+
+    In `PL4Y3R.py`, add lives attribute and a method to decrease lives:
+
+    In `G4M3.py`, decrease player's lives when an alien reaches the player:
+
+    Make sure to also handle the 'game_over' event in the `G4M3` class's `handle_event` method. We already have handling code for this event there, so no additional code is required.
+
+Remember, these are basic implementations and you might need to adjust them according to your game logic or add more complexity. For example, you might want to add a delay before starting a new level, or add a condition that an alien has to collide with the player to decrease the player's lives.
+

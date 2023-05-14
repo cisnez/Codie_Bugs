@@ -1,7 +1,15 @@
+Project: Learning Python listeners, messages, events, sentinels, and triggers.
+
 User
 I'm ready to get started on this python learning project again.
 
-Please write code to implement #1 movement of bullets and their collision detection with aliens.
+Please write code to: 
+  Implement Player Controls: 
+    Add keyboard controls to allow the player to move and shoot bullets.
+
+Remove the random Player input and implement movement using Right and Left arrow keys
+ OR `a` and `d` keys for left and right Player entity movement. 
+Add code to call the player.shoot method using `space_bar` OR `w` OR `up_arrow'.
 
 Game launch point.
 ```#G4M3.py
@@ -38,6 +46,7 @@ class G4M3(B453Object):
     def handle_event(self, event):
         if event == 'level_end':
             print("Level completed!")
+            self.start_new_level() 
         elif event == 'game_over':
             print("Game over!")
             # Additional game over logic here
@@ -55,6 +64,8 @@ class G4M3(B453Object):
 
     def update_game_state(self):
         self.player.move()
+        new_bullet = self.player.shoot()
+        self.bullets.append(new_bullet)
         rightmost_alien_x = max(alien.x for alien in self.aliens)
         leftmost_alien_x = min(alien.x for alien in self.aliens)
         if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
@@ -70,6 +81,7 @@ class G4M3(B453Object):
                     self.bullets.remove(bullet)
                     self.aliens.remove(alien)
                     break
+
     def draw_game_state(self):
         self.screen.fill((0, 0, 0)) 
         pygame.draw.rect(self.screen, (255, 255, 255), pygame.Rect(self.player.x, self.player.y, 50, 50))  
@@ -132,9 +144,11 @@ class S3N71N3L(B453Object):
     def check_condition(self):
         if all(alien.all_aliens_eliminated() for alien in self.aliens):
             self.trigger_event('level_end')
-        # In this case, the condition is a callable (like a function) that returns a boolean value. If the condition is met (i.e., it returns True), the Sentinel triggers the 'level_end' event.
+        elif any(alien.y >= self.player.y for alien in self.aliens): 
+            self.trigger_event('game_over')
         elif self.player.all_your_base_r_belong_2_us():
             self.trigger_event('game_over')
+
 ```
 
 ```
@@ -173,8 +187,10 @@ class BULL37(G4M3Object):
     def move(self):
         self.y -= 5  # Bullets move up the screen
 
-    def collides_with(self, other):
-        return self.x == other.x and self.y == other.y
+    def collides_with(self, alien):
+        # Check if the distance between the bullet's center and the alien's center is less than or equal to the alien's radius.
+        distance = ((self.x - alien.x)**2 + (self.y - alien.y)**2)**0.5
+        return distance <= alien.radius
 ```
 
 ```
@@ -182,20 +198,34 @@ class BULL37(G4M3Object):
 # Player Class:
 
 from G4M3Object import G4M3Object
-import random
+from EN717135.BULL37 import BULL37
 
 class PL4Y3R(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.shoot_bullet = False
+        # Player starts with 3 lives
+        self.lives = 3 
 
-    def move(self):
-        dx = random.randint(-1, 1)
-        dy = random.randint(-1, 1)
+    def decrease_lives(self):
+        self.lives -= 1
+        if self.lives == 0:
+            self.trigger_event('game_over')
+
+    def move(self, dx, dy):
         self.x += dx
         self.y += dy
 
     def shoot(self):
-        pass
+        if self.shoot_bullet:
+            self.shoot_bullet = False
+            # Return a new bullet instance that starts at the player's current location
+            return BULL37(self.x, self.y)
+        else:
+            return None
+
+    def should_shoot(self):
+        self.shoot_bullet = True
 
     def all_your_base_r_belong_2_us(self):
         return self.x <= 0
