@@ -31,8 +31,9 @@ class PL4Y3R(G4M3Object):
     def should_shoot(self):
         self.shoot_bullet = True
 
+    # check whether the player has moved off the right side of the screen.
     def all_your_base_r_belong_2_us(self):
-        return self.x <= 0
+        return self.x <= 0 or self.x >= 800
 
 # Please note that this is a simple demonstration. In a real game, you would want to add bounds checking to make sure the player doesn't move off the screen, and the player's movement would generally be controlled by the user's input, not random.
 

@@ -138,6 +138,9 @@ class B453Object:
 ```
 
 ```
+#S3N71N3L.py
+# Sentinel Class: This class extends the BaseObject class and acts as a trigger safety. It checks whether certain conditions are met before triggering its event.
+
 from B453Object import B453Object
 
 class S3N71N3L(B453Object):
@@ -147,13 +150,18 @@ class S3N71N3L(B453Object):
         self.aliens = aliens
 
     def check_condition(self):
-        if all(alien.all_aliens_eliminated() for alien in self.aliens):
+        # Check if Alien :codie_bug: has landed.
+        if any(alien.has_reached_bottom() for alien in self.aliens):
+            raise Exception("We have :codie_bug:'s!")
+        # Check if all Alien :codie_bug:'s have been eliminated
+        elif all(alien.all_aliens_eliminated() for alien in self.aliens):
             self.trigger_event('level_end')
+        # Check if any Alien :codie_bug: has reached the player
         elif any(alien.y >= self.player.y for alien in self.aliens): 
             self.trigger_event('game_over')
+        # Check if Player has retreated off of the screen.
         elif self.player.all_your_base_r_belong_2_us():
             self.trigger_event('game_over')
-
 ```
 
 ```
@@ -165,16 +173,21 @@ from G4M3Object import G4M3Object
 class AL13N(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.radius = 20
-        self.direction = 1 
-        self.speed = 10 
-        self.down_speed = 10 
+        self.radius = 20  # Add a radius attribute for drawing the circle
+        self.direction = 1  # Aliens start moving to the right
+        self.speed = 10  # Adjust to control the speed of the aliens
+        self.down_speed = 10  # Adjust to control how much the aliens move down after hitting a wall
 
     def move(self, direction):
         self.x += self.speed * direction
 
+    # Check if the alien has reached the bottom of the screen
+    def has_reached_bottom(self):
+        return self.y > 600
+    
+    # Check if there are any alien objects above the bottom of the display surface
     def all_aliens_eliminated(self):
-        return self.y > 580 
+        return self.y > 600
 ```
 
 ```
@@ -232,6 +245,7 @@ class PL4Y3R(G4M3Object):
     def should_shoot(self):
         self.shoot_bullet = True
 
+    # check whether the player has moved off the right side of the screen.
     def all_your_base_r_belong_2_us(self):
-        return self.x <= 0
+        return self.x <= 0 or self.x >= 800
 ```

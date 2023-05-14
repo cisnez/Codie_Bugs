@@ -14,6 +14,10 @@ class AL13N(G4M3Object):
     def move(self, direction):
         self.x += self.speed * direction
 
-    def all_aliens_eliminated(self):
-        return self.y > 600  # Check if the alien has reached the bottom of the screen
+    # Check if the alien has reached the bottom of the screen
+    def has_reached_bottom(self):
+        return self.y > 600
     
+    # Check if there are any alien objects above the bottom of the display surface
+    def all_aliens_eliminated(self):
+        return self.y > 600
