@@ -1,12 +1,17 @@
 Project: Learning Python listeners, messages, events, sentinels, and triggers.
 
 User:
-Current status... Console streams the message `Game Over` when the player moves off the left side of the screen. No messages are displated on the console when the player moves off the right side of the screen. When an alien reaches the player the console streams the message `Game over!`. When all the aliens move below the display surface the console reports,
- `Level completed!
-You eliminated all the codie bugs!
-Get ready for the next push!`
+Current status:
+1. The aliens reach the bottom of the display surface and game crashes with expected exception error.
+2. Console streams the message `Game Over` when the player moves off the left or right side of the screen.
+3. When an alien reaches the player the console streams the message `Game over!`.
 
-When the aliens reach the player, the player is supposed to lose a life, then the level starts over (clear bullets and reset :codie_bug: matrix). If the aliens reach the bottom of the display surface there should be an exception error. 
+Return code and explaination for following changes.
+1. When the aliens reach the player, the player is to lose a life or game over if last life.
+2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message.
+3. When the aliens reach the player a life is lost.
+4. The level starts over if a life is lost.
+4. The game ends if there are no more lives.
 
 Game launch point.
 ```#G4M3.py
