@@ -17,20 +17,17 @@ from EN717135.BULL37 import BULL37
 from EN717135.PL4Y3R import PL4Y3R
 from TR1663R.S3N71N3L import S3N71N3L
 
-# # This syntax imports the entire module and assigns it an alias. You then use the alias to access the classes within the module. For example, you can use AL13N.AL13N() to reference the AL13N class.
-# import EN717135.AL13N as AL13N
-# import EN717135.BULL37 as BULL37
-# import EN717135.PL4Y3R as PL4Y3R
-# import TR1663R.S3N71N3L as S3N71N3L
-
 class G4M3(B453Object):
     def __init__(self):
         super().__init__()
         pygame.init()
+        # Game On!
+        self.game_over = False
+
         # Create a display surface of 800x600 pixels
         self.screen = pygame.display.set_mode((800, 600))  
 
-        # Call Aliens, Bullers, and Players
+        # Call Aliens, Bullets, and Players
         self.aliens = []
         self.bullets = []
         # Initialize player at the bottom center of the screen
@@ -68,6 +65,7 @@ class G4M3(B453Object):
             self.start_new_level()
         elif event == 'game_over':
             print("Game over!")
+            self.game_over = True
             # Additional game over logic here
 
     # Other game methods omitted for brevity
@@ -86,7 +84,7 @@ class G4M3(B453Object):
     # When a Pygame window is open, it needs to process system events regularly in order to let the operating system know that it is still responsive. System events include things like mouse movements, button clicks, and also signals that the window should close (like when you click the 'X' button on the window frame). If these events are not processed regularly, the operating system will consider the window unresponsive.
     # To process these events, you need to call pygame.event.pump() or pygame.event.get() regularly. 
     def run(self):
-        while True:
+        while not self.game_over:
             # Get the state of all keyboard keys
             keys = pygame.key.get_pressed() 
             # If 'a' or the left arrow key is pressed

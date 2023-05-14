@@ -1,17 +1,24 @@
+
+
+
+
 Project: Learning Python listeners, messages, events, sentinels, and triggers.
 
 User:
 Current status:
 1. The aliens reach the bottom of the display surface and game crashes with expected exception error.
-2. Console streams the message `Game Over` when the player moves off the left or right side of the screen.
-3. When an alien reaches the player the console streams the message `Game over!`.
+2. I found a strange bug. 
+    a. If the player speed is set to 5 and the player hits the wall the Game Over event is triggered.
+    b. If the player speed is set to 20 then the player teleports to the opposite side of the screen.
+3. When an alien reaches the player nothing happens on the console and the game keeps going until exception error since lose a life or game over isn't working.
 
 Return code and explaination for following changes.
 1. When the aliens reach the player, the player is to lose a life or game over if last life.
-2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message.
+2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message no matter how slow or fast the player is moving.
 3. When the aliens reach the player a life is lost.
 4. The level starts over if a life is lost.
-4. The game ends if there are no more lives.
+5. The game ends if there are no more lives.
+6. Exception error is avoided by coding 1-5 properly.
 
 Game launch point.
 ```#G4M3.py
@@ -29,6 +36,7 @@ class G4M3(B453Object):
     def __init__(self):
         super().__init__()
         pygame.init()
+        self.game_over = False
         self.screen = pygame.display.set_mode((800, 600))  
         self.aliens = []
         self.bullets = []
@@ -53,10 +61,11 @@ class G4M3(B453Object):
             self.start_new_level() 
         elif event == 'game_over':
             print("Game over!")
+            self.game_over = True
             # Additional game over logic here
 
     def run(self):
-        while True:
+        while not self.game_over:
             for event in pygame.event.get():  # Process system events
                 if event.type == pygame.QUIT:  # The 'X' button was clicked
                     return
@@ -163,7 +172,7 @@ class S3N71N3L(B453Object):
             self.trigger_event('level_end')
         # Check if any Alien :codie_bug: has reached the player
         elif any(alien.y >= self.player.y for alien in self.aliens): 
-            self.trigger_event('game_over')
+            self.player.decrease_lives()
         # Check if Player has retreated off of the screen.
         elif self.player.all_your_base_r_belong_2_us():
             self.trigger_event('game_over')
@@ -234,10 +243,12 @@ class PL4Y3R(G4M3Object):
         self.lives -= 1
         if self.lives == 0:
             self.trigger_event('game_over')
+        else:
+            self.trigger_event('level_end')
 
     def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
+        self.x = (self.x + dx) % 800
+        self.y = (self.y + dy) % 600
 
     def shoot(self):
         if self.shoot_bullet:

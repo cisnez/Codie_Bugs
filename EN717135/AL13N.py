@@ -8,7 +8,7 @@ class AL13N(G4M3Object):
         super().__init__(x, y)
         self.radius = 20  # Add a radius attribute for drawing the circle
         self.direction = 1  # Aliens start moving to the right
-        self.speed = 10  # Adjust to control the speed of the aliens
+        self.speed = 30  # Adjust to control the speed of the aliens
         self.down_speed = 10  # Adjust to control how much the aliens move down after hitting a wall
 
     def move(self, direction):

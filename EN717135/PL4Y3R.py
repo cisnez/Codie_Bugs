@@ -15,10 +15,12 @@ class PL4Y3R(G4M3Object):
         self.lives -= 1
         if self.lives == 0:
             self.trigger_event('game_over')
+        else:
+            self.trigger_event('level_end')
 
     def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
+        self.x = (self.x + dx) % 800
+        self.y = (self.y + dy) % 600
 
     def shoot(self):
         if self.shoot_bullet:
