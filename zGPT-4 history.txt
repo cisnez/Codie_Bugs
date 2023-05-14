@@ -35,3 +35,13 @@ Here is the modified code:
 Please note that while this code removes bullets and moves aliens, there is still no check for when bullets leave the screen or for when aliens collide with the player. These are things you might want to add in the future.
 
 👾 Codie Bugs 👾
+
+You have some redundant code in your update_game_state method. The code for moving aliens and changing their direction is repeated twice. You also need to add a check to see if there are any aliens left before trying to calculate the rightmost and leftmost alien's x-coordinate.
+Let's correct that:
+
+This code is now checking whether there are any aliens before attempting to update their positions. It also only checks once for the condition to change the direction of the aliens. Additionally, if any alien reaches the player's level on the screen, the player's lives are decreased. Finally, bullets are moved and checked for collisions with aliens. If a bullet collides with an alien, both are removed from their respective lists.
+
+Please replace your existing update_game_state method with this corrected version.
+
+👾 Codie Bugs 👾
+

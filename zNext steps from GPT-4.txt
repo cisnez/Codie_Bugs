@@ -115,3 +115,4 @@ Here are some examples of end conditions you might want to implement:
 These are just a few ideas. The specific end conditions you implement will depend on how you want your game to work. Make sure to also update your `S3N71N3L` class's `check_condition` method to reflect these changes, as this is where you're currently handling your end conditions.
 
 👾 Codie Bugs 👾
+

@@ -1,12 +1,12 @@
 Project: Learning Python listeners, messages, events, sentinels, and triggers.
 
 User:
-For some reason the codie bugs stopped moving back and forth on the display surface.
+Current status... Console streams the message `Game Over` when the player moves off the left side of the screen. No messages are displated on the console when the player moves off the right side of the screen. When an alien reaches the player the console streams the message `Game over!`. When all the aliens move below the display surface the console reports,
+ `Level completed!
+You eliminated all the codie bugs!
+Get ready for the next push!`
 
-After I eliminated all the codie bugs, the console displayed, `Level completed!`; A new matrix of aliens spawned for a new level; The bullets from the previous level were still in flight and eliminated some of the codie bugs on the new level.
-
-Please find the reason why the :Codie_Bugs: stopped moving. Then write code to fix it. 
-Implement new level handling that clears all the bullets from the screen; Display message, `You eliminated all the :codie_bugs:!` new line `Get ready for the next push!`.
+When the aliens reach the player, the player is supposed to lose a life, then the level starts over (clear bullets and reset :codie_bug: matrix). If the aliens reach the bottom of the display surface there should be an exception error. 
 
 Game launch point.
 ```#G4M3.py
