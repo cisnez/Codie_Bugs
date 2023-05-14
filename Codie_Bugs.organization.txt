@@ -1,0 +1,20 @@
+/Codie_Bugs
+|-- /_1M6_
+|   |-- alien_monster.jpg
+|
+|-- /EN717135
+|   |-- __init__.py
+|   |-- AL13N.py
+|   |-- PL4Y3R.py
+|   |-- BULL37.py
+|
+|-- /TR1663R
+|   |-- __init__.py
+|   |-- S3N71N3L.py
+|
+|-- __init__.py
+|-- B453Object.py
+|-- Codie_Bugs.organization.txt # This file
+|-- G4M3.py
+|-- G4M3Object.py
+|-- zNext steps from GPT-4.txt  # Next steps for learning from GPT-4

@@ -1,0 +1,202 @@
+User
+I'm ready to get started on this python learning project again.
+
+Please write code to implement #1 movement of bullets and their collision detection with aliens.
+
+Game launch point.
+```#G4M3.py
+import time
+import pygame
+
+from B453Object import B453Object
+from G4M3Object import G4M3Object
+from EN717135.AL13N import AL13N
+from EN717135.BULL37 import BULL37
+from EN717135.PL4Y3R import PL4Y3R
+from TR1663R.S3N71N3L import S3N71N3L
+
+class G4M3(B453Object):
+    def __init__(self):
+        super().__init__()
+        pygame.init()
+        self.screen = pygame.display.set_mode((800, 600))  
+        self.aliens = []
+        self.bullets = []
+        self.player = PL4Y3R((800 - 50) / 2, 600 - 50)
+        self.alien_direction = -1  
+        self.level_end_sentinel = None
+        
+    def start_new_level(self):
+        self.aliens = []
+        for row in range(5):
+            for col in range(10):
+                self.aliens.append(AL13N(col * 60 + 50, row * 60 + 50)) 
+        
+        self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
+        self.level_end_sentinel.add_listener(self)
+
+    def handle_event(self, event):
+        if event == 'level_end':
+            print("Level completed!")
+        elif event == 'game_over':
+            print("Game over!")
+            # Additional game over logic here
+
+    def run(self):
+        while True:
+            for event in pygame.event.get():  # Process system events
+                if event.type == pygame.QUIT:  # The 'X' button was clicked
+                    return
+                # This will keep your window responsive and also allow you to close the window by clicking the 'X' button.
+            self.update_game_state()
+            self.draw_game_state()
+            self.level_end_sentinel.check_condition()
+            time.sleep(0.1)
+
+    def update_game_state(self):
+        self.player.move()
+        rightmost_alien_x = max(alien.x for alien in self.aliens)
+        leftmost_alien_x = min(alien.x for alien in self.aliens)
+        if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
+            self.alien_direction *= -1
+            for alien in self.aliens:
+                alien.y += alien.down_speed
+        for alien in self.aliens:
+            alien.move(self.alien_direction)
+        for bullet in self.bullets:
+            bullet.move()
+            for alien in self.aliens:
+                if bullet.collides_with(alien):
+                    self.bullets.remove(bullet)
+                    self.aliens.remove(alien)
+                    break
+    def draw_game_state(self):
+        self.screen.fill((0, 0, 0)) 
+        pygame.draw.rect(self.screen, (255, 255, 255), pygame.Rect(self.player.x, self.player.y, 50, 50))  
+        for alien in self.aliens:
+            pygame.draw.circle(self.screen, (0, 255, 0), (alien.x, alien.y), alien.radius)
+        for bullet in self.bullets:
+            pygame.draw.rect(self.screen, (255, 0, 0), pygame.Rect(bullet.x, bullet.y, bullet.width, bullet.height)) 
+        pygame.display.flip()  
+
+if __name__ == '__main__':
+    try:
+        game = G4M3()
+        game.start_new_level()
+        game.run()
+    finally:
+        pygame.quit()
+```
+
+```
+#G4M3Object.py
+# Game Object Class: This class will extend BaseObject and will be the parent class for all the actual game entities like Player, Alien, and Bullet.
+
+from B453Object import B453Object
+
+class G4M3Object(B453Object):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+```
+
+```
+#B453Object.py
+# Base Object Class: This will be the parent class for all game objects. It will contain listeners and methods to add, remove, and trigger events.
+
+class B453Object:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+        self.listeners = []
+
+    def add_listener(self, listener):
+        self.listeners.append(listener)
+
+    def remove_listener(self, listener):
+        self.listeners.remove(listener)
+
+    def trigger_event(self, event):
+        for listener in self.listeners:
+            listener.handle_event(event)
+```
+
+```
+from B453Object import B453Object
+
+class S3N71N3L(B453Object):
+    def __init__(self, player, aliens):
+        super().__init__()
+        self.player = player
+        self.aliens = aliens
+
+    def check_condition(self):
+        if all(alien.all_aliens_eliminated() for alien in self.aliens):
+            self.trigger_event('level_end')
+        # In this case, the condition is a callable (like a function) that returns a boolean value. If the condition is met (i.e., it returns True), the Sentinel triggers the 'level_end' event.
+        elif self.player.all_your_base_r_belong_2_us():
+            self.trigger_event('game_over')
+```
+
+```
+#AL13N.py
+# Alien Class:
+
+from G4M3Object import G4M3Object
+
+class AL13N(G4M3Object):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.radius = 20
+        self.direction = 1 
+        self.speed = 10 
+        self.down_speed = 10 
+
+    def move(self, direction):
+        self.x += self.speed * direction
+
+    def all_aliens_eliminated(self):
+        return self.y > 580 
+```
+
+```
+#BULL37.py
+# Bullet Class:
+
+from G4M3Object import G4M3Object
+
+class BULL37(G4M3Object):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.width = 5  # Add a width attribute for drawing the rectangle
+        self.height = 10  # Add a height attribute for drawing the rectangle
+
+    def move(self):
+        self.y -= 5  # Bullets move up the screen
+
+    def collides_with(self, other):
+        return self.x == other.x and self.y == other.y
+```
+
+```
+#PL4Y3R.py
+# Player Class:
+
+from G4M3Object import G4M3Object
+import random
+
+class PL4Y3R(G4M3Object):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+
+    def move(self):
+        dx = random.randint(-1, 1)
+        dy = random.randint(-1, 1)
+        self.x += dx
+        self.y += dy
+
+    def shoot(self):
+        pass
+
+    def all_your_base_r_belong_2_us(self):
+        return self.x <= 0
+```

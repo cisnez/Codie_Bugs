@@ -1,0 +1,3 @@
+# Pygame is licensed under the LGPL (Lesser General Public License). This license allows you to use, modify, and distribute the library in your software, as long as you comply with its terms, which generally includes making any modifications to the library itself available under the same license.
+# To install Pygame, you can use pip, which is the package installer for Python. Just open a command prompt or terminal and type the following command:
+pygame
