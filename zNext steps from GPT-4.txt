@@ -116,3 +116,80 @@ These are just a few ideas. The specific end conditions you implement will depen
 
 👾 Codie Bugs 👾
 
+I'll go through your proposed changes one by one:
+
+1. When the aliens reach the player, the player is to lose a life or game over if last life.
+
+To accomplish this, you need to modify the `check_condition` method in the `S3N71N3L` class. When an alien reaches the player, instead of triggering a game over event, you decrease the player's lives. The player's `decrease_lives` method will handle triggering the game over event if the player has no more lives.
+
+```python
+#S3N71N3L.py
+...
+def check_condition(self):
+    ...
+    # Check if any Alien :codie_bug: has reached the player
+    elif any(alien.y >= self.player.y for alien in self.aliens): 
+        self.player.decrease_lives()
+    ...
+```
+
+2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message.
+
+This will require a change to the `move` method in the `PL4Y3R` class. Instead of triggering a game over event when the player moves off screen, you wrap the player's position around to the opposite side of the screen.
+
+```python
+#PL4Y3R.py
+...
+def move(self, dx, dy):
+    self.x = (self.x + dx) % 800
+    self.y = (self.y + dy) % 600
+...
+```
+
+3. When the aliens reach the player a life is lost.
+
+This is the same as the first proposed change, and has already been addressed above.
+
+4. The level starts over if a life is lost.
+
+The `decrease_lives` method in the `PL4Y3R` class should be modified to trigger a level end event when a life is lost, which will cause a new level to start.
+
+```python
+#PL4Y3R.py
+...
+def decrease_lives(self):
+    self.lives -= 1
+    if self.lives == 0:
+        self.trigger_event('game_over')
+    else:
+        self.trigger_event('level_end')
+...
+```
+
+5. The game ends if there are no more lives.
+
+This is already handled in the `decrease_lives` method in the `PL4Y3R` class, as shown above. When the player has no more lives, a game over event is triggered.
+
+In your `G4M3` class, you should add a `game_over` flag and check it in your main game loop. When the game is over, you should break out of the loop and end the game.
+
+```python
+#G4M3.py
+...
+def __init__(self):
+    ...
+    self.game_over = False
+
+def handle_event(self, event):
+    ...
+    elif event == 'game_over':
+        print("Game over!")
+        self.game_over = True
+
+def run(self):
+    while not self.game_over:
+        ...
+```
+
+Please let me know if you need further clarifications or additional help.
+
+👾 Codie Bugs 👾
