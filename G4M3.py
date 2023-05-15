@@ -16,6 +16,7 @@ from EN717135.AL13N import AL13N
 from EN717135.BULL37 import BULL37
 from EN717135.PL4Y3R import PL4Y3R
 from TR1663R.S3N71N3L import S3N71N3L
+from TR1663R.EV3N7 import EV3N7
 
 class G4M3(B453Object):
     def __init__(self):
@@ -32,7 +33,7 @@ class G4M3(B453Object):
         self.bullets = []
         # Initialize player at the bottom center of the screen
         self.player = PL4Y3R((800 - 50) / 2, 600 - 50)
-        self.player_speed = 5
+        self.player_speed = 15
 
         # Aliens start moving to the left
         self.alien_direction = -1  
@@ -56,36 +57,38 @@ class G4M3(B453Object):
         
         # Create level end Sentinel
         self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
-        self.level_end_sentinel.add_listener(self)
+        self.level_end_sentinel.add_listener('game_over', self)
+        self.level_end_sentinel.add_listener('level_end', self)
 
     # The handle_event function has events like alien_hit, power_up, bullet_fired, and player_move which are placeholders with pass in their body. These do not currently do anything. 
     # These placeholders are represented to help guide development of new features.
     def handle_event(self, event):
-        if event == 'life_lost':
+        event_type = event.get_type()
+        if event_type == 'life_lost':
             print("A life was lost!")
             # Start the same level again
             self.start_level()
-        elif event == 'game_over':
+        elif event_type == 'game_over':
             print("Game over!")
             self.game_over = True
             # Additional game over logic here
-        elif event == 'next_level':
+        elif event_type == 'level_end':
             print("Next level!")
             # Start the next level
             self.start_level()
-        elif event == 'alien_hit':
+        elif event_type == 'alien_hit':
             print("Alien was hit!")
             # Implement your 'alien_hit' logic here
             pass  
-        elif event == 'power_up':
+        elif event_type == 'power_up':
             print("Power up!")
             # Implement your 'power_up' logic here
             pass
-        elif event == 'bullet_fired':
+        elif event_type == 'bullet_fired':
             print("Bullet fired!")
             # Implement your 'bullet_fired' logic here
             pass
-        elif event == 'player_move':
+        elif event_type == 'player_move':
             print("Player moved!")
             # Implement your 'player_move' logic here
             pass
@@ -107,7 +110,9 @@ class G4M3(B453Object):
 
     # First, let's add a basic game loop to your G4M3 class:
     # When a Pygame window is open, it needs to process system events regularly in order to let the operating system know that it is still responsive. System events include things like mouse movements, button clicks, and also signals that the window should close (like when you click the 'X' button on the window frame). If these events are not processed regularly, the operating system will consider the window unresponsive.
-    # To process these events, you need to call pygame.event.pump() or pygame.event.get() regularly. 
+    # To process these events, you need to call pygame.event.pump() or pygame.event.get() regularly.
+    #   pygame.event.pump() - function internally processes Pygame events. It handles window-related events such as resizing, minimizing, etc. If you do not call pump() function and are not using get() or poll(), your game window might become unresponsive.
+    #   pygame.event.get() - function typically used in the game loop to continuously check for events. Unlike event.pump(), event.get() not only processes Pygame events but also retrieves them so you can handle the events in your game code. In most cases, you would use get() instead of pump() because you usually want to handle events, not just process them.
     def run(self):
         while not self.game_over:
             # Get the state of all keyboard keys
@@ -159,6 +164,8 @@ class G4M3(B453Object):
                 alien.move(self.alien_direction)
                 # Alien has reached the player
                 if alien.y >= self.player.y:
+                    # Remove alien that hit the player
+                    self.aliens.remove(alien)
                     # Decrease player's lives
                     self.player.decrease_lives()
 

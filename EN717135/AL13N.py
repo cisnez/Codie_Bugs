@@ -11,17 +11,13 @@ class AL13N(G4M3Object):
         # Aliens start moving to the right
         self.direction = 1
         # Adjust to control the speed of the aliens
-        self.speed = 30
+        self.speed = 20
         # Adjust to control how much the aliens move down after hitting a wall
-        self.down_speed = 10
+        self.down_speed = 20
 
     def move(self, direction):
         self.x += self.speed * direction
 
     # Check if the alien has reached the bottom of the screen
     def has_reached_bottom(self):
-        return self.y > 600
-    
-    # Check if there are any alien objects above the bottom of the display surface
-    def all_aliens_eliminated(self):
         return self.y > 600

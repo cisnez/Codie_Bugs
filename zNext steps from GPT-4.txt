@@ -164,3 +164,101 @@ Please let me know if you need further clarifications or additional help.
 
 👾 Codie Bugs 👾
 
+You have a solid foundation for your game and a good understanding of the various components that are required to build it. Let's now modify your code according to the changes you want:
+
+1. When the aliens reach the player a life is to be lost.
+2. The game ends if there are no more lives.
+
+In order to implement these changes, we need to modify the `check_condition` method in the `S3N71N3L` class and the `decrease_lives` method in the `PL4Y3R` class.
+
+Here's the updated code:
+
+In `S3N71N3L.py`:
+
+In `PL4Y3R.py`:
+
+Explanation:
+In the `S3N71N3L` class, `check_condition` method checks if any alien has reached the player by comparing their `y` values. If an alien has reached the player, it calls the `decrease_lives` method of the player. The `decrease_lives` method in the `PL4Y3R` class reduces the player's lives by 1. If the player has no more lives left (i.e., `self.lives` is less than or equal to 0), it triggers a 'game_over' event. Otherwise, it triggers a 'life_lost' event.
+
+When a 'life_lost' event is triggered, the `handle_event` method in the `G4M3` class will start the same level again. If a 'game_over' event is triggered, the `handle_event` method will set `self.game_over` to True, which will stop the game loop in the `run` method.
+
+With these changes, when an alien reaches the player, a life will be lost, and the same level will start again. If the player has no more lives, the game will end.
+
+👾 Codie Bugs 👾
+
+Remember, the key goal of any design pattern or architectural choice is to solve problems effectively and to make the development process easier. If your current design is not meeting those goals, it's always a good idea to reassess and make necessary changes. However, if it is functioning well for your needs, a complete redesign might not be necessary. 
+
+One potential enhancement could be introducing a way to categorize your listeners, so you don't need to iterate over all of them every time an event is triggered. This could be done by having a dictionary of event types to listeners instead of a single list. This would make the `trigger_event` method more efficient, especially as the number of listeners grows.
+
+Here's an example of how you might implement this:
+...
+
+This code requires that your event objects have a `get_type` method to identify what type of event they are, and listeners are now added and removed with reference to a specific event type. This way, when an event is triggered, only the listeners associated with that type of event are called. 
+
+Again, this is just a suggestion based on the code you've shared. If you could share more details about what you're trying to achieve or what problems you're facing, I could provide more tailored advice.
+
+👾 Codie Bugs 👾
+
+In light of the recent changes in B453Object, you'll need to make sure that when you add a listener to an object, you also specify the event type that the listener is supposed to handle.
+
+So, wherever you have code that adds a listener.
+
+You'll need to change it to include the event type.
+
+The event_type is a unique identifier (usually a string or a constant) for the type of event that the listener is supposed to handle.
+
+Similarly, when removing a listener, you'll need to specify the event type.
+
+As for the trigger_event method, you won't need to change how you call it, but the event objects that you pass to it will need to have a get_type method. This method should return the event type for that event.
+
+If your event objects don't currently have a get_type method, you'll need to add one. 
+
+In this example, each event has a type and associated data. The get_type method just returns the event type. You would create and trigger an event like this:
+
+This is just a general idea. The exact details will depend on how your event and listener classes are structured, and what kind of data your events need to carry.
+
+👾 Codie Bugs 👾
+
+If you only ever add one listener and never remove it, the benefits of the updated architecture may not be immediately apparent. The advantages of such a system typically come into play when you have many different types of events and many listeners for each type.
+
+However, even with just one listener, there could still be benefits. One potential advantage is that your code becomes more organized and easier to understand. By specifying an event type when adding a listener, it becomes clear what type of events the listener is supposed to handle. This could make your code easier to maintain and debug, especially if you or someone else comes back to it after a long time.
+
+Another potential advantage is that it sets your code up to be easily extendable in the future. Suppose you decide later that you want to add more types of events and listeners. In that case, you already have a structure in place to support that, and you can do so without having to change the `B453Object` class or any of its methods.
+
+That said, whether or not to implement these changes depends on your specific needs and circumstances. If your game works well with the current system, and you don't foresee needing to handle multiple event types or add more listeners, it might not be necessary to make these changes. As always, the best solution depends on the specifics of your project.
+
+**Also, if you're interested in more advanced programming patterns, you could consider looking into the observer pattern or the publish-subscribe pattern, both of which are widely used in event-driven programming.**
+
+👾 Codie Bugs 👾
+
+Your EV3N7 class looks well-structured and the file location seems logical. You've placed it in the TR1663R folder, which suggests it's related to triggering events. This is a sensible organization if you're planning to add more classes related to event handling in this folder.
+
+As for the add_listener method, you have already implemented it in your B453Object class. The add_listener method is responsible for registering a listener for a specific type of event. You provide it with an event type and a listener, and it adds the listener to the list of listeners for that event type.
+
+To use the add_listener method, you'll need to modify the start_level method in the G4M3 class 
+
+In the S3N71N3L class, the trigger_event method calls should be replaced with an EV3N7 instance.
+
+And so on for other trigger_event calls.
+
+Now, when you call trigger_event, you pass it an EV3N7 object that contains information about what type of event it is and any associated data. The trigger_event method then notifies all listeners registered for that event type.
+
+Please ensure that the listener object (self in the above start_level example) has a handle_event method which accepts an EV3N7 object as argument, as the trigger_event method in B453Object expects this. This method should contain the logic to handle each type of event.
+
+Regarding the "messages" in your learning path, messages could be interpreted as the data carried by the events. For example, if an event is a 'collision', the message could be the details of the objects involved in the collision. In the EV3N7 class, this would be represented by the data attribute. However, you can design a specific Message class if your game requires more complex messaging between objects.
+
+👾 Codie Bugs 👾
+
+You're right, the all_aliens_eliminated function in the AL13N class is no longer necessary since we're directly checking the length of the aliens list in the S3N71N3L class. This new approach is more efficient and direct because it directly checks whether there are any remaining AL13N instances in the aliens list.
+
+The all_aliens_eliminated function was previously checking if the y-coordinate of each individual alien was greater than 600, which would mean that the alien had reached the bottom of the screen. However, this check is redundant because aliens that reach the bottom of the screen are already removed from the aliens list in the G4M3 class' update_game_state function.
+
+So, you can remove the all_aliens_eliminated function from the AL13N class. 
+
+The game should function the same way as before, but the code is now more efficient and easier to read.
+
+👾 Codie Bugs 👾
+
+
+👾 Codie Bugs 👾
+

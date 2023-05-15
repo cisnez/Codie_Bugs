@@ -2,6 +2,7 @@
 # Sentinel Class: This class extends the BaseObject class and acts as a trigger safety. It checks whether certain conditions are met before triggering its event.
 
 from B453Object import B453Object
+from TR1663R.EV3N7 import EV3N7
 
 class S3N71N3L(B453Object):
     def __init__(self, player, aliens):
@@ -13,15 +14,24 @@ class S3N71N3L(B453Object):
         # Check if Alien :codie_bug: has landed.
         if any(alien.has_reached_bottom() for alien in self.aliens):
             raise Exception("We have :codie_bug:'s!")
-        # Check if all Alien :codie_bug:'s have been eliminated
-        elif all(alien.all_aliens_eliminated() for alien in self.aliens):
-            self.trigger_event('level_end')
         # Check if any Alien :codie_bug: has reached the player
         elif any(alien.y >= self.player.y for alien in self.aliens): 
+            # This will trigger 'life_lost' or 'game_over' event
             self.player.decrease_lives()
+            if self.player.lives == 0: 
+                self.trigger_event(EV3N7('game_over', {}))
+        # If there are no aliens, end the level
+        elif not self.aliens:
+            self.trigger_event(EV3N7('level_end', {}))
+        # Check if all Alien :codie_bug:'s have been eliminated
+        elif all(alien.all_aliens_eliminated() for alien in self.aliens):
+            self.trigger_event(EV3N7('level_end', {}))
+        # Trigger 'game_over' event when player's lives reach 0.
+        elif self.player.lives == 0: 
+            self.trigger_event(EV3N7('game_over', {}))
         # Check if Player has lost the base.
         elif self.player.all_your_base_r_belong_2_us():
-            self.trigger_event('game_over')
+            self.trigger_event(EV3N7('game_over', {}))
 
 # If a Sentinel is used as a trigger safety, it would essentially act as a guard condition before a certain action or event can be triggered. Let's consider an end-of-level Sentinel as an example.
 

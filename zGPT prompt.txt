@@ -1,30 +1,16 @@
+**Also, if you're interested in more advanced programming patterns, you could consider looking into the observer pattern or the publish-subscribe pattern, both of which are widely used in event-driven programming.**
+
 User
 You are an exper python programmer.
 
 Project: Develop a learning path for Python: listeners, messages, events, sentinels, and triggers.
 
-The original design goals mention:
-    "To process these events, you need to call pygame.event.pump() or pygame.event.get() regularly."
-1. What is event.pump?
-2. Why did we choose to only use event.get?
-
 **Current status:**
-1. I found a strange bug. Player speed is not behaving consistently.
-    a. If the player speed is set to 5 and the player hits the wall the Game Over event is triggered.
-    b. If the player speed is set to 20 then the player teleports to the opposite side of the screen.
-2. When an alien reaches the player nothing happens on the console and the game keeps going until exception error since lose a life or game over isn't working.
-3. As expected since #2 doesn't work the aliens reach the bottom of the display surface and the game crashes with the expected exception error. This needs to remain as this situation should never happen.
-4. We created a base object method to remove_listener and we never use it. Our sentinel does add_listener and never remove_listener. Would it be best to 
+1. When an alien reaches the player it is removed from the screen.
+    All the aliens hit the player and are removed.
+        The game never ends and a new level never starts.
 
-
-**Return code and explaination for following changes.**
-1. When the aliens reach the player, the player is to lose a life or game over if last life.
-2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message no matter how slow or fast the player is moving. Currently the game is over if the player speed is set to slow value.
-3. When the aliens reach the player a life is to be lost.
-4. The game ends if there are no more lives.
-5. The level starts over if a life is lost.
-6. Keep the exception error and avoid it by coding 1-5 properly.
-7. Have the sentinel `try` check_condition, if any are caught then, remove_listener, and do what we need to do. Am I right to believe that all the check_conditions are going to result in spawning a new sentinel?   
+**Return code and explaination to fix the issue.**
 
 Game launch point.
 ```#G4M3.py
@@ -41,24 +27,19 @@ from EN717135.AL13N import AL13N
 from EN717135.BULL37 import BULL37
 from EN717135.PL4Y3R import PL4Y3R
 from TR1663R.S3N71N3L import S3N71N3L
+from TR1663R.EV3N7 import EV3N7
 
 class G4M3(B453Object):
     def __init__(self):
         super().__init__()
         pygame.init()
-
         self.game_over = False
-
         self.screen = pygame.display.set_mode((800, 600))  
-
         self.aliens = []
         self.bullets = []
-
         self.player = PL4Y3R((800 - 50) / 2, 600 - 50)
-        self.player_speed = 5
-
+        self.player_speed = 15
         self.alien_direction = -1  
-
         self.level_end_sentinel = None
         
     def start_level(self):
@@ -68,36 +49,37 @@ class G4M3(B453Object):
         for row in range(5):
             for col in range(10):
                 self.aliens.append(AL13N(col * 60 + 50, row * 60 + 50)) 
-        
         self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
-        self.level_end_sentinel.add_listener(self)
+        self.level_end_sentinel.add_listener('game_over', self)
+        self.level_end_sentinel.add_listener('level_end', self)
 
     def handle_event(self, event):
-        if event == 'life_lost':
+        event_type = event.get_type()
+        if event_type == 'life_lost':
             print("A life was lost!")
             # Start the same level again
             self.start_level()
-        elif event == 'game_over':
+        elif event_type == 'game_over':
             print("Game over!")
             self.game_over = True
             # Additional game over logic here
-        elif event == 'next_level':
+        elif event_type == 'level_end':
             print("Next level!")
             # Start the next level
             self.start_level()
-        elif event == 'alien_hit':
+        elif event_type == 'alien_hit':
             print("Alien was hit!")
             # Implement your 'alien_hit' logic here
             pass  
-        elif event == 'power_up':
+        elif event_type == 'power_up':
             print("Power up!")
             # Implement your 'power_up' logic here
             pass
-        elif event == 'bullet_fired':
+        elif event_type == 'bullet_fired':
             print("Bullet fired!")
             # Implement your 'bullet_fired' logic here
             pass
-        elif event == 'player_move':
+        elif event_type == 'player_move':
             print("Player moved!")
             # Implement your 'player_move' logic here
             pass
@@ -114,7 +96,6 @@ class G4M3(B453Object):
                 self.player.move(self.player_speed, 0)
             if keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]:
                 self.player.should_shoot()
-
             for event in pygame.event.get():  
                 if event.type == pygame.QUIT:  
                     return
@@ -125,11 +106,9 @@ class G4M3(B453Object):
 
     def update_game_state(self):
         self.player.move(0, 0) 
-
         new_bullet = self.player.shoot()
         if new_bullet is not None:
             self.bullets.append(new_bullet)
-
         if self.aliens:
             rightmost_alien_x = max(alien.x for alien in self.aliens)
             leftmost_alien_x = min(alien.x for alien in self.aliens)
@@ -140,8 +119,8 @@ class G4M3(B453Object):
             for alien in self.aliens:
                 alien.move(self.alien_direction)
                 if alien.y >= self.player.y:
+                    self.aliens.remove(alien)
                     self.player.decrease_lives()
-
         for bullet in self.bullets:
             bullet.move()
             for alien in self.aliens:
@@ -201,10 +180,27 @@ class B453Object:
 ```
 
 ```
+#EV3N7.py
+# Event Class: This class extends the BaseObject class and acts as a trigger safety. It checks whether certain conditions are met before triggering its event.
+
+class EV3N7:
+    def __init__(self, event_type, data):
+        self.event_type = event_type
+        self.data = data
+
+    def get_type(self):
+        return self.event_type
+
+    def get_data(self):
+        return self.data
+```
+
+```
 #S3N71N3L.py
 # Sentinel Class: This class extends the BaseObject class and acts as a trigger safety. It checks whether certain conditions are met before triggering its event.
 
 from B453Object import B453Object
+from TR1663R.EV3N7 import EV3N7
 
 class S3N71N3L(B453Object):
     def __init__(self, player, aliens):
@@ -213,18 +209,19 @@ class S3N71N3L(B453Object):
         self.aliens = aliens
 
     def check_condition(self):
-        # Check if Alien :codie_bug: has landed.
         if any(alien.has_reached_bottom() for alien in self.aliens):
             raise Exception("We have :codie_bug:'s!")
-        # Check if all Alien :codie_bug:'s have been eliminated
-        elif all(alien.all_aliens_eliminated() for alien in self.aliens):
-            self.trigger_event('level_end')
-        # Check if any Alien :codie_bug: has reached the player
         elif any(alien.y >= self.player.y for alien in self.aliens): 
+            # This will trigger 'life_lost' or 'game_over' event
             self.player.decrease_lives()
-        # Check if Player has lost the base.
+            if self.player.lives == 0: 
+                self.trigger_event(EV3N7('game_over', {}))
+        elif all(alien.all_aliens_eliminated() for alien in self.aliens):
+            self.trigger_event(EV3N7('level_end', {}))
+        elif self.player.lives == 0: 
+            self.trigger_event(EV3N7('game_over', {}))
         elif self.player.all_your_base_r_belong_2_us():
-            self.trigger_event('game_over')
+            self.trigger_event(EV3N7('game_over', {}))
 ```
 
 ```
@@ -238,16 +235,13 @@ class AL13N(G4M3Object):
         super().__init__(x, y)
         self.radius = 20 
         self.direction = 1
-        self.speed = 30
-        self.down_speed = 10
+        self.speed = 20
+        self.down_speed = 20
 
     def move(self, direction):
         self.x += self.speed * direction
 
     def has_reached_bottom(self):
-        return self.y > 600
-    
-    def all_aliens_eliminated(self):
         return self.y > 600
 ```
 
@@ -287,9 +281,9 @@ class PL4Y3R(G4M3Object):
     def decrease_lives(self):
         self.lives -= 1
         if self.lives == 0:
-            self.trigger_event('game_over')
+            self.trigger_event(EV3N7('game_over', {}))
         else:
-            self.trigger_event('level_end')
+            self.trigger_event(EV3N7('life_lost', {}))
 
     def move(self, dx, dy):
         self.x = (self.x + dx) % 800

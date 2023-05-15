@@ -3,6 +3,7 @@
 
 from G4M3Object import G4M3Object
 from EN717135.BULL37 import BULL37
+from TR1663R.EV3N7 import EV3N7
 
 class PL4Y3R(G4M3Object):
     def __init__(self, x, y):
@@ -14,9 +15,9 @@ class PL4Y3R(G4M3Object):
     def decrease_lives(self):
         self.lives -= 1
         if self.lives == 0:
-            self.trigger_event('game_over')
+            self.trigger_event(EV3N7('game_over', {}))
         else:
-            self.trigger_event('level_end')
+            self.trigger_event(EV3N7('life_lost', {}))
 
     def move(self, dx, dy):
         self.x = (self.x + dx) % 800
