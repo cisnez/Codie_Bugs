@@ -19,7 +19,7 @@ class S3N71N3L(B453Object):
         # Check if any Alien :codie_bug: has reached the player
         elif any(alien.y >= self.player.y for alien in self.aliens): 
             self.player.decrease_lives()
-        # Check if Player has retreated off of the screen.
+        # Check if Player has lost the base.
         elif self.player.all_your_base_r_belong_2_us():
             self.trigger_event('game_over')
 

@@ -1,6 +1,6 @@
 #G4M3.py
 # Game Class: This class would manage the overall game, including creating and managing all the game objects, handling user input, and updating the game state.
-# 2 Game Class: The Game class might have a Sentinel as an attribute. It could create this Sentinel when a new level starts and define the condition that must be met for the level to end.
+# Note 1: This Game class has a Sentinel as an attribute. It creates a new Sentinel when a level starts and defines the condition that must be met for the play to end.
 
 # The event processing loop is located in the run method of the G4M3 class:
 
@@ -39,11 +39,11 @@ class G4M3(B453Object):
 
         # Call Sentinel
         self.level_end_sentinel = None
-
         
-    def start_new_level(self):
-        print("You eliminated all the codie bugs!\nGet ready for the next push!")
-        # Clear bullets
+    # The start_level method is called within the handle_event function when the life_lost and next_level events occur. It also initializes the level_end_sentinel.
+    def start_level(self):
+        print("You are starting a level!\nGet ready for the next push!")
+         # Clear bullets
         self.bullets = []
         # Create aliens in rows
         self.aliens = []
@@ -58,17 +58,40 @@ class G4M3(B453Object):
         self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
         self.level_end_sentinel.add_listener(self)
 
+    # The handle_event function has events like alien_hit, power_up, bullet_fired, and player_move which are placeholders with pass in their body. These do not currently do anything. 
+    # These placeholders are represented to help guide development of new features.
     def handle_event(self, event):
-        if event == 'level_end':
-            print("Level completed!")
-            # start a new level after the current one is completed
-            self.start_new_level()
+        if event == 'life_lost':
+            print("A life was lost!")
+            # Start the same level again
+            self.start_level()
         elif event == 'game_over':
             print("Game over!")
             self.game_over = True
             # Additional game over logic here
-
-    # Other game methods omitted for brevity
+        elif event == 'next_level':
+            print("Next level!")
+            # Start the next level
+            self.start_level()
+        elif event == 'alien_hit':
+            print("Alien was hit!")
+            # Implement your 'alien_hit' logic here
+            pass  
+        elif event == 'power_up':
+            print("Power up!")
+            # Implement your 'power_up' logic here
+            pass
+        elif event == 'bullet_fired':
+            print("Bullet fired!")
+            # Implement your 'bullet_fired' logic here
+            pass
+        elif event == 'player_move':
+            print("Player moved!")
+            # Implement your 'player_move' logic here
+            pass
+        # add any other events as needed
+        # elif event == 'another_event':
+        #     do_something()
 
     # # 4.
     # You'll notice I've used the concept of listeners and events, and each game object is a "message" in its own right, having state and behavior. The queue could be used for handling the game loop, user input, or any other buffered sequence of actions. A "sentinel" could be a game object that represents some special condition or event in the game (like a power-up or an end-of-level marker). A "trigger" could be a specific game event or condition that triggers some action (like an alien reaching the bottom of the screen or the player's score reaching a certain value).
@@ -79,6 +102,8 @@ class G4M3(B453Object):
     # In this case, the Sentinel's condition is the all_aliens_eliminated method, which checks whether there are any aliens left. If all aliens are eliminated, the Sentinel triggers its event, and the game responds accordingly.
 
     # This is a simplified example and a real game might have more complex conditions and responses. It's also worth noting that the handle_event method could handle various different events, and you might want to use something more sophisticated than string comparison for the event types.
+
+    # You'll probably also want to update your game to handle other events, like keyboard or mouse input. For example, to make the player move when the arrow keys are pressed, you could add something like this in your event processing loop:
 
     # First, let's add a basic game loop to your G4M3 class:
     # When a Pygame window is open, it needs to process system events regularly in order to let the operating system know that it is still responsive. System events include things like mouse movements, button clicks, and also signals that the window should close (like when you click the 'X' button on the window frame). If these events are not processed regularly, the operating system will consider the window unresponsive.
@@ -110,6 +135,8 @@ class G4M3(B453Object):
     # This run method will keep the game running, constantly updating and drawing the game state. We're using a simple time.sleep call to delay each frame and control the game speed. This is a simple way to achieve this, but a real game might use a more complex method to control frame rate.
 
     # Next, we need to implement the update_game_state and draw_game_state methods. These will be responsible for moving all game objects and checking for collisions (update_game_state), and for drawing all game objects to the screen (draw_game_state). For now, these methods can be very simple:
+    
+    # Responsible for moving all game objects and checking for collisions (update_game_state)
     def update_game_state(self):
         # Not move the player by default
         self.player.move(0, 0) 
@@ -144,6 +171,8 @@ class G4M3(B453Object):
                     self.aliens.remove(alien)
                     break
 
+    # Responsible for drawing all game objects to the Pygame display surface (draw_game_state). 
+    # Pygame provides several methods for drawing shapes, images, and text. 
     def draw_game_state(self):
         # Clear the screen by filling it with black
         self.screen.fill((0, 0, 0)) 
@@ -161,7 +190,6 @@ class G4M3(B453Object):
         
         # Update the display
         pygame.display.flip()  
-    #     In your draw_game_state method, you would draw your game objects onto the Pygame display surface. Pygame provides several methods for drawing shapes, images, and text. 
 
     # This is a very simple implementation of the game loop and game state updates. In a real game, you would likely use a game library or framework to handle drawing graphics, moving game objects with physics, and handling user input.
 
@@ -169,7 +197,7 @@ class G4M3(B453Object):
 if __name__ == '__main__':
     try:
         game = G4M3()
-        game.start_new_level()
+        game.start_level()
         game.run()
     finally:
         pygame.quit()

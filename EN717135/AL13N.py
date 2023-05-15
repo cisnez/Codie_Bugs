@@ -6,10 +6,14 @@ from G4M3Object import G4M3Object
 class AL13N(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.radius = 20  # Add a radius attribute for drawing the circle
-        self.direction = 1  # Aliens start moving to the right
-        self.speed = 30  # Adjust to control the speed of the aliens
-        self.down_speed = 10  # Adjust to control how much the aliens move down after hitting a wall
+        # Add a radius attribute for drawing the circle
+        self.radius = 20 
+        # Aliens start moving to the right
+        self.direction = 1
+        # Adjust to control the speed of the aliens
+        self.speed = 30
+        # Adjust to control how much the aliens move down after hitting a wall
+        self.down_speed = 10
 
     def move(self, direction):
         self.x += self.speed * direction

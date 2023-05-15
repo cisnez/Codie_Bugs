@@ -1,29 +1,39 @@
+User
+You are an exper python programmer.
 
+Project: Develop a learning path for Python: listeners, messages, events, sentinels, and triggers.
 
+The original design goals mention:
+    "To process these events, you need to call pygame.event.pump() or pygame.event.get() regularly."
+1. What is event.pump?
+2. Why did we choose to only use event.get?
 
-
-Project: Learning Python listeners, messages, events, sentinels, and triggers.
-
-User:
-Current status:
-1. The aliens reach the bottom of the display surface and game crashes with expected exception error.
-2. I found a strange bug. 
+**Current status:**
+1. I found a strange bug. Player speed is not behaving consistently.
     a. If the player speed is set to 5 and the player hits the wall the Game Over event is triggered.
     b. If the player speed is set to 20 then the player teleports to the opposite side of the screen.
-3. When an alien reaches the player nothing happens on the console and the game keeps going until exception error since lose a life or game over isn't working.
+2. When an alien reaches the player nothing happens on the console and the game keeps going until exception error since lose a life or game over isn't working.
+3. As expected since #2 doesn't work the aliens reach the bottom of the display surface and the game crashes with the expected exception error. This needs to remain as this situation should never happen.
+4. We created a base object method to remove_listener and we never use it. Our sentinel does add_listener and never remove_listener. Would it be best to 
 
-Return code and explaination for following changes.
+
+**Return code and explaination for following changes.**
 1. When the aliens reach the player, the player is to lose a life or game over if last life.
-2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message no matter how slow or fast the player is moving.
-3. When the aliens reach the player a life is lost.
-4. The level starts over if a life is lost.
-5. The game ends if there are no more lives.
-6. Exception error is avoided by coding 1-5 properly.
+2. When player goes off the screen they enter from the other side of the screen instead of `Game Over` message no matter how slow or fast the player is moving. Currently the game is over if the player speed is set to slow value.
+3. When the aliens reach the player a life is to be lost.
+4. The game ends if there are no more lives.
+5. The level starts over if a life is lost.
+6. Keep the exception error and avoid it by coding 1-5 properly.
+7. Have the sentinel `try` check_condition, if any are caught then, remove_listener, and do what we need to do. Am I right to believe that all the check_conditions are going to result in spawning a new sentinel?   
 
 Game launch point.
 ```#G4M3.py
+# Game Class: This class would manage the overall game, including creating and managing all the game objects, handling user input, and updating the game state.
+# Note 1: This Game class has a Sentinel as an attribute. It creates a new Sentinel when a level starts and defines the condition that must be met for the play to end.
+
+# The event processing loop is located in the run method of the G4M3 class:
+
 import time
-import pygame
 
 from B453Object import B453Object
 from G4M3Object import G4M3Object
@@ -36,70 +46,109 @@ class G4M3(B453Object):
     def __init__(self):
         super().__init__()
         pygame.init()
+
         self.game_over = False
+
         self.screen = pygame.display.set_mode((800, 600))  
+
         self.aliens = []
         self.bullets = []
+
         self.player = PL4Y3R((800 - 50) / 2, 600 - 50)
+        self.player_speed = 5
+
         self.alien_direction = -1  
+
         self.level_end_sentinel = None
         
-    def start_new_level(self):
-        print("You eliminated all the codie bugs!\nGet ready for the next push!")
+    def start_level(self):
+        print("You are starting a level!\nGet ready for the next push!")
         self.bullets = []
         self.aliens = []
         for row in range(5):
             for col in range(10):
-                # Spacing aliens by 60 pixels and offsetting them by 50 pixels from the edge
                 self.aliens.append(AL13N(col * 60 + 50, row * 60 + 50)) 
+        
         self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
         self.level_end_sentinel.add_listener(self)
 
     def handle_event(self, event):
-        if event == 'level_end':
-            print("Level completed!")
-            self.start_new_level() 
+        if event == 'life_lost':
+            print("A life was lost!")
+            # Start the same level again
+            self.start_level()
         elif event == 'game_over':
             print("Game over!")
             self.game_over = True
             # Additional game over logic here
+        elif event == 'next_level':
+            print("Next level!")
+            # Start the next level
+            self.start_level()
+        elif event == 'alien_hit':
+            print("Alien was hit!")
+            # Implement your 'alien_hit' logic here
+            pass  
+        elif event == 'power_up':
+            print("Power up!")
+            # Implement your 'power_up' logic here
+            pass
+        elif event == 'bullet_fired':
+            print("Bullet fired!")
+            # Implement your 'bullet_fired' logic here
+            pass
+        elif event == 'player_move':
+            print("Player moved!")
+            # Implement your 'player_move' logic here
+            pass
+        # add any other events as needed
+        # elif event == 'another_event':
+        #     do_something()
 
     def run(self):
         while not self.game_over:
-            for event in pygame.event.get():  # Process system events
-                if event.type == pygame.QUIT:  # The 'X' button was clicked
+            keys = pygame.key.get_pressed() 
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:  
+                self.player.move(-self.player_speed, 0)
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]: 
+                self.player.move(self.player_speed, 0)
+            if keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]:
+                self.player.should_shoot()
+
+            for event in pygame.event.get():  
+                if event.type == pygame.QUIT:  
                     return
-                # This will keep your window responsive and also allow you to close the window by clicking the 'X' button.
             self.update_game_state()
             self.draw_game_state()
             self.level_end_sentinel.check_condition()
             time.sleep(0.1)
 
-def update_game_state(self):
-    self.player.move(0, 0) 
-    new_bullet = self.player.shoot()
-    if new_bullet is not None:
-        self.bullets.append(new_bullet)
-    if self.aliens:
-        rightmost_alien_x = max(alien.x for alien in self.aliens)
-        leftmost_alien_x = min(alien.x for alien in self.aliens)
-        if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
-            self.alien_direction *= -1
+    def update_game_state(self):
+        self.player.move(0, 0) 
+
+        new_bullet = self.player.shoot()
+        if new_bullet is not None:
+            self.bullets.append(new_bullet)
+
+        if self.aliens:
+            rightmost_alien_x = max(alien.x for alien in self.aliens)
+            leftmost_alien_x = min(alien.x for alien in self.aliens)
+            if rightmost_alien_x + self.aliens[0].speed > 800 or leftmost_alien_x - self.aliens[0].speed < 0:
+                self.alien_direction *= -1
+                for alien in self.aliens:
+                    alien.y += alien.down_speed
             for alien in self.aliens:
-                alien.y += alien.down_speed
-        for alien in self.aliens:
-            alien.move(self.alien_direction)
-            # Alien has reached the player
-            if alien.y >= self.player.y:
-                # Decrease player's lives
-                self.player.decrease_lives()
-    for bullet in self.bullets:
-        bullet.move()
-        for alien in self.aliens:
-            if bullet.collides_with(alien):
-                self.bullets.remove(bullet)
-                self.aliens.remove(alien)
-                break
+                alien.move(self.alien_direction)
+                if alien.y >= self.player.y:
+                    self.player.decrease_lives()
+
+        for bullet in self.bullets:
+            bullet.move()
+            for alien in self.aliens:
+                if bullet.collides_with(alien):
+                    self.bullets.remove(bullet)
+                    self.aliens.remove(alien)
+                    break
 
     def draw_game_state(self):
         self.screen.fill((0, 0, 0)) 
@@ -107,13 +156,13 @@ def update_game_state(self):
         for alien in self.aliens:
             pygame.draw.circle(self.screen, (0, 255, 0), (alien.x, alien.y), alien.radius)
         for bullet in self.bullets:
-            pygame.draw.rect(self.screen, (255, 0, 0), pygame.Rect(bullet.x, bullet.y, bullet.width, bullet.height)) 
+            pygame.draw.rect(self.screen, (255, 0, 0), pygame.Rect(bullet.x, bullet.y, bullet.width, bullet.height))
         pygame.display.flip()  
 
 if __name__ == '__main__':
     try:
         game = G4M3()
-        game.start_new_level()
+        game.start_level()
         game.run()
     finally:
         pygame.quit()
@@ -121,7 +170,7 @@ if __name__ == '__main__':
 
 ```
 #G4M3Object.py
-# Game Object Class: This class will extend BaseObject and will be the parent class for all the actual game entities like Player, Alien, and Bullet.
+# Game Object Class: This class will extend the Base Object and will be the parent class for all the actual game entities like Player, Alien, and Bullet.
 
 from B453Object import B453Object
 
@@ -173,7 +222,7 @@ class S3N71N3L(B453Object):
         # Check if any Alien :codie_bug: has reached the player
         elif any(alien.y >= self.player.y for alien in self.aliens): 
             self.player.decrease_lives()
-        # Check if Player has retreated off of the screen.
+        # Check if Player has lost the base.
         elif self.player.all_your_base_r_belong_2_us():
             self.trigger_event('game_over')
 ```
@@ -187,19 +236,17 @@ from G4M3Object import G4M3Object
 class AL13N(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.radius = 20  # Add a radius attribute for drawing the circle
-        self.direction = 1  # Aliens start moving to the right
-        self.speed = 10  # Adjust to control the speed of the aliens
-        self.down_speed = 10  # Adjust to control how much the aliens move down after hitting a wall
+        self.radius = 20 
+        self.direction = 1
+        self.speed = 30
+        self.down_speed = 10
 
     def move(self, direction):
         self.x += self.speed * direction
 
-    # Check if the alien has reached the bottom of the screen
     def has_reached_bottom(self):
         return self.y > 600
     
-    # Check if there are any alien objects above the bottom of the display surface
     def all_aliens_eliminated(self):
         return self.y > 600
 ```
@@ -213,14 +260,13 @@ from G4M3Object import G4M3Object
 class BULL37(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.width = 5  # Add a width attribute for drawing the rectangle
-        self.height = 10  # Add a height attribute for drawing the rectangle
+        self.width = 5
+        self.height = 10
 
     def move(self):
-        self.y -= 5  # Bullets move up the screen
+        self.y -= 5
 
     def collides_with(self, alien):
-        # Check if the distance between the bullet's center and the alien's center is less than or equal to the alien's radius.
         distance = ((self.x - alien.x)**2 + (self.y - alien.y)**2)**0.5
         return distance <= alien.radius
 ```
@@ -236,7 +282,6 @@ class PL4Y3R(G4M3Object):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.shoot_bullet = False
-        # Player starts with 3 lives
         self.lives = 3 
 
     def decrease_lives(self):
@@ -253,7 +298,6 @@ class PL4Y3R(G4M3Object):
     def shoot(self):
         if self.shoot_bullet:
             self.shoot_bullet = False
-            # Return a new bullet instance that starts at the player's current location
             return BULL37(self.x, self.y)
         else:
             return None
@@ -261,7 +305,6 @@ class PL4Y3R(G4M3Object):
     def should_shoot(self):
         self.shoot_bullet = True
 
-    # check whether the player has moved off the right side of the screen.
     def all_your_base_r_belong_2_us(self):
         return self.x <= 0 or self.x >= 800
 ```
