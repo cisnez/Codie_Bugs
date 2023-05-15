@@ -1,5 +1,5 @@
 #BULL37.py
-# Bullet Class:
+# Bullet Class: Represents a bullet fired by the player, controlling its movement and handling its interactions with other game objects.
 
 from G4M3Object import G4M3Object
 

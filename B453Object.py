@@ -1,5 +1,5 @@
 #B453Object.py
-# Base Object Class: This will be the parent class for all game objects. It will contain listeners and methods to add, remove, and trigger events.
+# Base Object Class: Parent class for all game objects, encapsulating common behaviors such as adding, removing, and triggering events.
 
 class B453Object:
     def __init__(self, x=0, y=0):

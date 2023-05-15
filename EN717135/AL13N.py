@@ -1,5 +1,5 @@
 #AL13N.py
-# Alien Class:
+# Alien Class: Represents an alien in the game, handling its movements, collisions, and interactions with other game objects.
 
 from G4M3Object import G4M3Object
 

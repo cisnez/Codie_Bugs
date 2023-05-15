@@ -1,5 +1,5 @@
 #EV3N7.py
-# Event Class: This class extends the BaseObject class and acts as a trigger safety. It checks whether certain conditions are met before triggering its event.
+# Event Class: Represents an event that can be triggered during the game, such as a player losing a life or an alien being hit.
 
 class EV3N7:
     def __init__(self, event_type, data):

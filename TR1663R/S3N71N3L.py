@@ -1,5 +1,5 @@
 #S3N71N3L.py
-# Sentinel Class: This class extends the BaseObject class and acts as a trigger safety. It checks whether certain conditions are met before triggering its event.
+# Sentinel Class: Extends the BaseObject class and monitors the game state, triggering specific events when certain conditions are met.
 
 from B453Object import B453Object
 from TR1663R.EV3N7 import EV3N7
@@ -23,15 +23,6 @@ class S3N71N3L(B453Object):
         # If there are no aliens, end the level
         elif not self.aliens:
             self.trigger_event(EV3N7('level_end', {}))
-        # Check if all Alien :codie_bug:'s have been eliminated
-        elif all(alien.all_aliens_eliminated() for alien in self.aliens):
-            self.trigger_event(EV3N7('level_end', {}))
-        # Trigger 'game_over' event when player's lives reach 0.
-        elif self.player.lives == 0: 
-            self.trigger_event(EV3N7('game_over', {}))
-        # Check if Player has lost the base.
-        elif self.player.all_your_base_r_belong_2_us():
-            self.trigger_event(EV3N7('game_over', {}))
 
 # If a Sentinel is used as a trigger safety, it would essentially act as a guard condition before a certain action or event can be triggered. Let's consider an end-of-level Sentinel as an example.
 

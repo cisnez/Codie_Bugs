@@ -1,8 +1,9 @@
 #G4M3.py
-# Game Class: This class would manage the overall game, including creating and managing all the game objects, handling user input, and updating the game state.
-# Note 1: This Game class has a Sentinel as an attribute. It creates a new Sentinel when a level starts and defines the condition that must be met for the play to end.
+# This is the main Game class that manages the overall game. It initializes the game, creates and manages all game objects, handles user input, updates the game state, and defines the conditions for the game to end.
 
-# The event processing loop is located in the run method of the G4M3 class:
+# Note: This Game class has a Sentinel as an attribute. It creates a new Sentinel when a level starts and defines the condition that must be met for the play to end.
+
+# The event processing loop is the run() method of the G4M3 class.
 
 import time
 
@@ -33,14 +34,18 @@ class G4M3(B453Object):
         self.bullets = []
         # Initialize player at the bottom center of the screen
         self.player = PL4Y3R((800 - 50) / 2, 600 - 50)
+        self.player.add_listener('game_over', self)
+        self.player.add_listener('life_lost', self)
         self.player_speed = 15
 
         # Aliens start moving to the left
         self.alien_direction = -1  
 
-        # Call Sentinel
-        self.level_end_sentinel = None
-        
+        # Call a new Sentinel 
+        self.level_end_sentinel = S3N71N3L(self.player, self.aliens)
+        self.level_end_sentinel.add_listener('game_over', self)
+        self.level_end_sentinel.add_listener('level_end', self)
+
     # The start_level method is called within the handle_event function when the life_lost and next_level events occur. It also initializes the level_end_sentinel.
     def start_level(self):
         print("You are starting a level!\nGet ready for the next push!")
@@ -60,7 +65,9 @@ class G4M3(B453Object):
         self.level_end_sentinel.add_listener('game_over', self)
         self.level_end_sentinel.add_listener('level_end', self)
 
-    # The handle_event function has events like alien_hit, power_up, bullet_fired, and player_move which are placeholders with pass in their body. These do not currently do anything. 
+    class GameOverException(Exception):
+        pass
+    # The handle_event function has events like alien_hit, power_up, bullet_fired, and player_move which are placeholders with pass in their body. These do not currently do anything.
     # These placeholders are represented to help guide development of new features.
     def handle_event(self, event):
         event_type = event.get_type()
@@ -71,7 +78,7 @@ class G4M3(B453Object):
         elif event_type == 'game_over':
             print("Game over!")
             self.game_over = True
-            # Additional game over logic here
+            raise G4M3.GameOverException()
         elif event_type == 'level_end':
             print("Next level!")
             # Start the next level
@@ -98,13 +105,6 @@ class G4M3(B453Object):
 
     # # 4.
     # You'll notice I've used the concept of listeners and events, and each game object is a "message" in its own right, having state and behavior. The queue could be used for handling the game loop, user input, or any other buffered sequence of actions. A "sentinel" could be a game object that represents some special condition or event in the game (like a power-up or an end-of-level marker). A "trigger" could be a specific game event or condition that triggers some action (like an alien reaching the bottom of the screen or the player's score reaching a certain value).
-    #
-    # Please note that this is a very basic skeleton structure. A real game would require more sophisticated handling of game physics, graphics rendering, user input, sound, and more. You'd also want to add more game-specific logic to the methods of these classes, and you may need to add more methods and classes
-
-    # # 2.
-    # In this case, the Sentinel's condition is the all_aliens_eliminated method, which checks whether there are any aliens left. If all aliens are eliminated, the Sentinel triggers its event, and the game responds accordingly.
-
-    # This is a simplified example and a real game might have more complex conditions and responses. It's also worth noting that the handle_event method could handle various different events, and you might want to use something more sophisticated than string comparison for the event types.
 
     # You'll probably also want to update your game to handle other events, like keyboard or mouse input. For example, to make the player move when the arrow keys are pressed, you could add something like this in your event processing loop:
 
@@ -114,38 +114,40 @@ class G4M3(B453Object):
     #   pygame.event.pump() - function internally processes Pygame events. It handles window-related events such as resizing, minimizing, etc. If you do not call pump() function and are not using get() or poll(), your game window might become unresponsive.
     #   pygame.event.get() - function typically used in the game loop to continuously check for events. Unlike event.pump(), event.get() not only processes Pygame events but also retrieves them so you can handle the events in your game code. In most cases, you would use get() instead of pump() because you usually want to handle events, not just process them.
     def run(self):
-        while not self.game_over:
-            # Get the state of all keyboard keys
-            keys = pygame.key.get_pressed() 
-            # If 'a' or the left arrow key is pressed
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:  
-                self.player.move(-self.player_speed, 0)
-            # If 'd' or the right arrow key is pressed
-            if keys[pygame.K_d] or keys[pygame.K_RIGHT]: 
-                self.player.move(self.player_speed, 0)
-            # If 'space' or 'w' or the up arrow key is pressed
-            if keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]:
-                self.player.should_shoot()
+        try:
+            while not self.game_over:
+                # Get the state of all keyboard keys
+                keys = pygame.key.get_pressed() 
+                # If 'a' or the left arrow key is pressed
+                if keys[pygame.K_a] or keys[pygame.K_LEFT]:  
+                    self.player.move(-self.player_speed, 0)
+                # If 'd' or the right arrow key is pressed
+                if keys[pygame.K_d] or keys[pygame.K_RIGHT]: 
+                    self.player.move(self.player_speed, 0)
+                # If 'space' or 'w' or the up arrow key is pressed
+                if keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]:
+                    self.player.should_shoot()
 
-            # Process system events
-            for event in pygame.event.get():  
-                # The 'X' button was clicked
-                if event.type == pygame.QUIT:  
-                    return
-                # This will keep your window responsive and also allow you to close the window by clicking the 'X' button.
-            self.update_game_state()
-            self.draw_game_state()
-            self.level_end_sentinel.check_condition()
-            time.sleep(0.1)
+                # Process system events
+                for event in pygame.event.get():  
+                    # The 'X' button was clicked
+                    if event.type == pygame.QUIT:  
+                        return
+                    # This will keep your window responsive and also allow you to close the window by clicking the 'X' button.
+                self.update_game_state()
+                self.draw_game_state()
+                self.level_end_sentinel.check_condition()
+                time.sleep(0.1)
+        except G4M3.GameOverException:
+            print("The game has ended. Thanks for playing!")
+        finally:
+            pygame.quit()
     # This run method will keep the game running, constantly updating and drawing the game state. We're using a simple time.sleep call to delay each frame and control the game speed. This is a simple way to achieve this, but a real game might use a more complex method to control frame rate.
 
     # Next, we need to implement the update_game_state and draw_game_state methods. These will be responsible for moving all game objects and checking for collisions (update_game_state), and for drawing all game objects to the screen (draw_game_state). For now, these methods can be very simple:
     
     # Responsible for moving all game objects and checking for collisions (update_game_state)
     def update_game_state(self):
-        # Not move the player by default
-        self.player.move(0, 0) 
-
         # Add a new bullet to the list for every call to player.shoot
         new_bullet = self.player.shoot()
         if new_bullet is not None:
@@ -164,10 +166,14 @@ class G4M3(B453Object):
                 alien.move(self.alien_direction)
                 # Alien has reached the player
                 if alien.y >= self.player.y:
-                    # Remove alien that hit the player
-                    self.aliens.remove(alien)
                     # Decrease player's lives
                     self.player.decrease_lives()
+                    # Remove alien that hit the player
+                    if alien in self.aliens:
+                        try:
+                            self.aliens.remove(alien)
+                        except ValueError:
+                            print("Tried to remove an alien that was not in the list.")
 
         # Move bullets and check for collisions
         for bullet in self.bullets:
